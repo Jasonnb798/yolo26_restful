@@ -1,0 +1,237 @@
+/* 全局设置 */
+body {
+    background-color: #f0f8ff; /* 淡蓝色背景 */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 标题样式 */
+header h1 {
+    font-size: 3rem; /* 调大字号 */
+    margin-top: 30px;
+    letter-spacing: 3px;
+    /* 彩色渐变效果 */
+    background: linear-gradient(135deg, #007bff, #00ff88, #ff007b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+/* 主容器 */
+.container {
+    width: 90%;
+    max-width: 1000px;
+    text-align: center;
+}
+
+/* 上传按钮样式 */
+.upload-section {
+    margin: 30px 0;
+}
+
+#uploadBtn {
+    padding: 10px 25px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 20px; /* 按钮圆角 */
+    cursor: pointer;
+    transition: all 0.3s ease; /* 过渡动画 */
+}
+
+/* 按钮悬停阴影 */
+#uploadBtn:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 图片展示区域布局 */
+.display-area {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.image-card {
+    flex: 1;
+}
+
+/* 图片窗口样式 */
+.window {
+    width: 100%;
+    height: 450px;           /* 核心：设定固定高度，确保窗口不随图片变动 */
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 15px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;          /* 防止容器被挤压 */
+}
+
+.window img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;     /* 核心：图片比例缩放，窗口尺寸保持不动 */
+}
+
+/* 图片窗口悬停阴影 */
+.window:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    border-color: #007bff;
+}
+
+.window img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* 1. 彻底隐藏那个难看的原生“选择文件”按钮 */
+#imageInput {
+    display: none;
+}
+
+/* 2. 把 label 装饰成和“开始识别”一样好看的按钮 */
+.custom-file-upload {
+    display: inline-block;
+    padding: 10px 25px;
+    background-color: #6c757d; /* 灰色，与开始识别的蓝色区分开 */
+    color: white;
+    border-radius: 20px;       /* 圆弧边框 */
+    cursor: pointer;           /* 鼠标变成小手 */
+    font-size: 16px;
+    transition: all 0.3s ease; /* 平滑过渡动画 */
+    border: 1px solid transparent;
+}
+
+/* 3. 鼠标悬停在自定义上传按钮上的效果 */
+.custom-file-upload:hover {
+    background-color: #5a6268;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* 边缘阴影 */
+    transform: translateY(-2px);               /* 微弱上浮感 */
+}
+
+/* 1. 全屏遮罩层 */
+#loadingOverlay {
+    display: none;      /* 默认隐藏，由 JS 在点击时开启 */
+    position: fixed;    /* 固定在屏幕最上方 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.85); /* 半透明白色背景 */
+    z-index: 9999;      /* 确保在所有元素之上 */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 2. 旋转的圆圈 */
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3;       /* 浅色底圈 */
+    border-top: 6px solid #007bff;   /* 蓝色活动圈 */
+    border-radius: 50%;              /* 变成圆圈 */
+    animation: spin 1s linear infinite; /* 定义旋转动画 */
+}
+
+/* 3. 定义旋转动作 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 彻底重塑导航条：变细、变长、居中 */
+.nav-controls {
+    display: none;           /* 初始隐藏 */
+    flex-direction: row;     /* 强制横向排列 */
+    align-items: center;     /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    gap: 30px;               /* 按钮间的间距 */
+
+    margin: 20px auto;       /* 上下留 20px 间距，左右自动居中 */
+    padding: 8px 30px;       /* 减小上下内边距，变成细长条 */
+
+    background: #ffffff;     /* 纯白背景 */
+    border: 1px solid #ddd;  /* 细边框 */
+    border-radius: 40px;     /* 胶囊形状 */
+    width: fit-content;      /* 宽度刚好包裹内容，不要撑满屏 */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05); /* 淡淡的阴影 */
+}
+
+/* 缩小翻页按钮的大小 */
+.nav-btn {
+    padding: 5px 15px;
+    font-size: 14px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* 页码文字大小 */
+#pageInfo {
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* 切换按钮样式 */
+.nav-btn {
+    padding: 8px 20px;
+    background-color: #343a40; /* 深色背景 */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.nav-btn:hover {
+    background-color: #23272b;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* 中间的页码文字 (例如 1 / 5) */
+#pageInfo {
+    font-size: 18px;
+    font-weight: bold;
+    color: #495057;
+    min-width: 60px; /* 防止文字跳动 */
+}
+
+/*模型选择*/
+.model-section {
+    margin: 20px 0;
+}
+
+/* 下拉框风格与页面按钮保持一致 */
+#modelSelect {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: 2px solid #007bff;
+    border-radius: 25px; /* 圆弧风格 */
+    background-color: white;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+    color: #333;
+    min-width: 200px;
+    text-align: center;
+}
+
+#modelSelect:hover {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    border-color: #0056b3;
+}
