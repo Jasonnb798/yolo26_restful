@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>YOLO26 GALLERY</title>
+    <!-- 关联 CSS 文件 -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+
+<body>
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>正在识别中，请稍候...</p>
+    </div>
+
+    <!-- 顶部标题 -->
+    <header>
+        <h1>YOLO26 GALLERY</h1>
+    </header>
+
+    <main class="container">
+        <div class="model-section">
+            <label for="modelSelect" style="font-weight: bold; color: #555;">识别模型：</label>
+            <select id="modelSelect">
+                <option value="yolo26l">YOLO 26l (默认)</option>
+                <option value="yolo26n">YOLO 26n (快速)</option>
+                <option value="yolo26x">YOLO 26x (精准)</option>
+            </select>
+        </div>
+        <!-- 上传区域 -->
+        <div class="upload-section">
+          <label for="imageInput" class="custom-file-upload">选择图片 (支持多选)</label>
+          <input type="file" id="imageInput" accept="image/*" multiple> <!-- 加上 multiple -->
+          <button id="uploadBtn">开始识别</button>
+        </div>
+
+        <!-- 图像显示区域 -->
+        <div class="display-area">
+            <div class="image-card">
+                <h3>原始图片</h3>
+                <div class="window" id="originalWindow">
+                    <img id="originalImg" src="" alt="等待上传...">
+                </div>
+            </div>
+
+            <div class="image-card">
+                <h3>识别结果</h3>
+                <div class="window" id="resultWindow">
+                    <img id="resultImg" src="" alt="等待识别...">
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="nav-controls" id="navControls">
+               <button class="nav-btn" id="prevBtn">上一张</button>
+               <span id="pageInfo">0 / 0</span>
+               <button class="nav-btn" id="nextBtn">下一张</button>
+        </div>
+    </main>
+
+</body>
+
+<script>
+    let resultsList = []; // 存储所有图片结果
+    let currentIndex = 0; // 当前显示的图片索引
+
+    const imageInput = document.getElementById('imageInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const navControls = document.getElementById('navControls');
+
+    // 1. 当选择文件时（仅预览第一张）
+    imageInput.onchange = (e) => {
+    if (e.target.files.length > 0) {
+        document.getElementById('originalImg').src = URL.createObjectURL(e.target.files[0]);
+        document.getElementById('resultImg').src = "";
+        // 核心：清空旧的识别结果状态
+        resultsList = [];
+        document.getElementById('navControls').style.display = 'none';
+    }
+};
+
+    // 2. 上传识别逻辑
+    uploadBtn.onclick = async () => {
+        const files = imageInput.files;
+        if (files.length === 0) return alert("请先选择图片");
+
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append("files", files[i]); // 注意这里键名是 files，对应后端的参数
+        }
+
+        const selectedModel = document.getElementById('modelSelect').value;
+        formData.append("model_name", selectedModel);
+
+        // 显示加载动画
+        loadingOverlay.style.display = 'flex';
+
+        try {
+            const response = await fetch("/predict", { method: "POST", body: formData });
+            resultsList = await response.json();
+
+            if (resultsList.length > 0) {
+                currentIndex = 0;
+                navControls.style.display = 'flex'; // 显示切换按钮
+                updateDisplay();
+            }
+        } catch (error) {
+            alert("识别失败");
+        } finally {
+            loadingOverlay.style.display = 'none'; // 隐藏加载动画
+        }
+    };
+
+    // 3. 更新画面显示
+    function updateDisplay() {
+        const item = resultsList[currentIndex];
+        document.getElementById('originalImg').src = item.original_path;
+        document.getElementById('resultImg').src = item.result_path + "?t=" + new Date().getTime();
+        document.getElementById('pageInfo').innerText = `${currentIndex + 1} / ${resultsList.length}`;
+    }
+
+    // 4. 左右切换按钮逻辑
+    document.getElementById('prevBtn').onclick = () => {
+        if (resultsList.length === 0) return;
+        currentIndex = (currentIndex - 1 + resultsList.length) % resultsList.length;
+        updateDisplay();
+    };
+
+    document.getElementById('nextBtn').onclick = () => {
+        if (resultsList.length === 0) return;
+        currentIndex = (currentIndex + 1) % resultsList.length;
+        updateDisplay();
+    };
+</script>
+</html>
+
 
