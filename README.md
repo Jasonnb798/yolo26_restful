@@ -6,3 +6,4 @@ successfully complete the detection of one single picture.
 
 second version
 successfully accomplished the multiple input and detection, and optimize the UI as well
+right now is going to make videos detected and demonstrated in VLC/my website
