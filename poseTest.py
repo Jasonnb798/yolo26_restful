@@ -17,6 +17,7 @@ print("RTSP连接成功")
 
 #记录举手帧数
 raise_hand_count = 0
+action = "None"
 
 while True:
 
@@ -96,9 +97,16 @@ while True:
         )
 
         if hand_raised:
-            print("举手")
+            raise_hand_count += 1
         else:
-            print("没有举手")
+            raise_hand_count = 0
+
+        if raise_hand_count >= 3:
+            action = "Raise Hand"
+        else:
+            action = "No Raise"
+
+        print(action)
 
     '''
     最后进行绘制与opencv打开视频
@@ -106,6 +114,17 @@ while True:
 
     # 绘制人体框和骨架
     annotated_frame = results[0].plot()
+
+    #将动作识别结果打印到视频画面上
+    cv2.putText(
+        annotated_frame,
+        action,
+        (50, 100),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        1.2,
+        (0, 255, 0),
+        3
+    )
 
     cv2.imshow(
         "YOLO26 Pose",
