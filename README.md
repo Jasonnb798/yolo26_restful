@@ -7,3 +7,6 @@ successfully complete the detection of one single picture.
 second version
 successfully accomplished the multiple input and detection, and optimize the UI as well
 right now is going to make videos detected and demonstrated in VLC/my website
+
+The website is perfect, with capabilities to demonstrate the detection of things and the tracking and sketon of person.
+now it's going through pose and action detection
